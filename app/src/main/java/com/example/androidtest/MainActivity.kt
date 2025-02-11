@@ -10,6 +10,10 @@ import androidx.core.view.WindowInsetsCompat
 import android.content.Context
 import android.widget.Button
 import android.widget.TextView
+import android.content.Intent
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         UpButton.setOnClickListener {
             counter++
+            if(counter == 10) {
+                counter = 0
+                val intent = Intent(this, SuccessActivity::class.java).apply {
+                    putExtra("name", findViewById<TextView>(R.id.plainTextName).text.toString())
+                }
+                startActivity(intent)
+            }
             textViewCounter.text = counter.toString()
         }
 
