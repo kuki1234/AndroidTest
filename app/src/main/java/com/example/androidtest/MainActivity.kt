@@ -11,8 +11,8 @@ import android.content.Context
 import android.widget.Button
 import android.widget.TextView
 import android.content.Intent
-
-
+import android.view.Menu
+import android.view.MenuItem
 
 
 class MainActivity : AppCompatActivity() {
@@ -99,5 +99,21 @@ class MainActivity : AppCompatActivity() {
         super.onRestart()
         Toast.makeText(applicationContext, "onRestart", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onRestart")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.restore_counter -> {
+                // kod za 19. zadatak
+                true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
