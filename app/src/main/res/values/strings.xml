@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Fit Runner</string>
+    <string name="app_name" translatable="false">Fit Runner</string>
+    <string name="textview">TextView</string>
+    <string name="up">UP</string>
+    <string name="down">DOWN</string>
+    <string name="name">Name:</string>
+    <string name="name_success">Name</string>
+    <string name="resetiraj">Reset</string>
+    <string name="hrvatski">Croatian</string>
+    <string name="engleski">English</string>
 </resources>

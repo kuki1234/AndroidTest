@@ -22,6 +22,6 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="text"
-            android:text="Name" />
+            android:text="@string/name_success" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
