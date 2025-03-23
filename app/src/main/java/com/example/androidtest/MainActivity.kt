@@ -11,9 +11,13 @@ import android.content.Context
 import android.widget.Button
 import android.widget.TextView
 import android.content.Intent
+import android.content.res.Configuration
 import android.view.Menu
 import android.view.MenuItem
-
+import android.view.ContextMenu
+import android.view.MenuInflater
+import android.view.View
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,25 +28,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        // The Toolbar defined in the layout has the id "my_toolbar".
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
-
         textViewCounter = findViewById(R.id.textViewCounter)
-        val UpButton = findViewById<Button>(R.id.buttonUp)
+        val upButton = findViewById<Button>(R.id.buttonUp)
         val downButton = findViewById<Button>(R.id.buttonDown)
 
-        // Učitavanje spremljene vrijednosti iz SharedPreferences
+
+        // Spremanje imena korisnika
+        val plainTextName = findViewById<TextView>(R.id.plainTextName) // Ovdje se uzima ime korisnika
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("USER_NAME", plainTextName.text.toString()) // Spremaj ime
+        editor.apply()
+
+        // Učitavanje spremljene vrijednosti iz SharedPreferences
         counter = sharedPreferences.getInt("COUNTER_VALUE", 0)
         textViewCounter.text = counter.toString()
 
-        UpButton.setOnClickListener {
+        upButton.setOnClickListener {
             counter++
             if(counter == 10) {
                 counter = 0
                 val intent = Intent(this, SuccessActivity::class.java).apply {
-                    putExtra("name", findViewById<TextView>(R.id.plainTextName).text.toString())
+                    // Prenosi ime korisnika u SuccessActivity
+                    putExtra("name", plainTextName.text.toString())
                 }
                 startActivity(intent)
             }
@@ -56,6 +66,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Registracija dugog pritiska za reset
+        registerForContextMenu(textViewCounter)
+    }
+
+
+    // Kreiranje kontekstnog menija na dug pritisak
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_float, menu)
+    }
+
+    // Rukovanje odabirom opcije u meniju
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_reset -> {
+                counter = 0
+                textViewCounter.text = counter.toString()
+                Toast.makeText(this, "Broj resetiran!", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
     }
 
     // Spremanje trenutnog brojača prilikom promjene orijentacije
@@ -76,16 +109,19 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(applicationContext, "onStart", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onStart")
     }
+
     override fun onResume() {
         super.onResume()
         Toast.makeText(applicationContext, "onResume", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onResume")
     }
+
     override fun onPause() {
         super.onPause()
         Toast.makeText(applicationContext, "onPause", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onPause")
     }
+
     override fun onStop() {
         super.onStop()
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
@@ -94,11 +130,13 @@ class MainActivity : AppCompatActivity() {
             apply()
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         Toast.makeText(applicationContext, "onDestroy", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onDestroy")
     }
+
     override fun onRestart() {
         super.onRestart()
         Toast.makeText(applicationContext, "onRestart", Toast.LENGTH_SHORT).show()
@@ -112,16 +150,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.restore_counter -> {
-                counter = 0
-                textViewCounter.text = counter.toString()
-                return true
+        return when (item.itemId) {
+            R.id.action_english -> {
+                changeLanguage(this, "en")  // Postavljanje jezika na engleski
+                recreate()  // Ponovno pokreće aktivnost da primijeni promjene
+                true
             }
+            R.id.action_croatian -> {
+                changeLanguage(this, "hr")  // Postavljanje jezika na hrvatski
+                recreate()  // Ponovno pokreće aktivnost da primijeni promjene
+                true
+            }
+            R.id.restore_counter -> {  // Dodajte ovo za resetiranje brojača
+                counter = 0  // Resetirajte brojač
+                textViewCounter.text = counter.toString()  // Ažurirajte UI
+                Toast.makeText(this, "Broj resetiran!", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
+
+    @Suppress("DEPRECATION")
+    fun changeLanguage(context: Context, language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val res = context.resources
+        val config = Configuration(res.configuration)
+        config.setLocale(locale)
+        context.createConfigurationContext(config)
+        res.updateConfiguration(config, res.displayMetrics)
+    }
 
 
     class MyActivity : AppCompatActivity() {

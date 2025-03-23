@@ -1,11 +1,11 @@
 package com.example.androidtest
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class SuccessActivity : AppCompatActivity() {
     lateinit var textView: TextView
@@ -15,8 +15,30 @@ class SuccessActivity : AppCompatActivity() {
         setContentView(R.layout.activity_success)
 
         textView = findViewById(R.id.textView)
+        val btnSendSMS = findViewById<Button>(R.id.btnSendSMS)
 
-        val name = intent.getStringExtra("name")
-        textView.text = "$name uspješno ste došli do 10 koraka."
+        // Preuzimanje imena korisnika iz Intenta
+        val name = intent.getStringExtra("name") ?: "Korisnik"  // Ako ime nije proslijeđeno, koristi "Korisnik"
+
+        // Kreiraj tekst pomoću getString i formatiranja
+        val successMessage = getString(R.string.success, name)
+
+        // Postavi tekst u TextView
+        textView.text = successMessage
+
+        btnSendSMS.setOnClickListener {
+            val phoneNumber = "0917829521"
+            val message = "$name je upravo završio trčanje i prešao 10 koraka! 🏃‍♂️💪"
+
+            val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("smsto:$phoneNumber")
+                putExtra("sms_body", message)
+            }
+
+            startActivity(smsIntent)
+        }
     }
 }
+
+
+

@@ -8,4 +8,5 @@
     <string name="resetiraj">Reset</string>
     <string name="hrvatski">Croatian</string>
     <string name="engleski">English</string>
+    <string name="success">%1$s, successfully completed 10 steps!</string>
 </resources>

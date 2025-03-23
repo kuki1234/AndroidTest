@@ -14,14 +14,26 @@
         android:orientation="vertical"
         android:background="@drawable/running_abstract">
 
-        <EditText
-            android:background="?colorSecondary"
-            android:textColor="?colorOnSecondary"
+
+        <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:text="@string/name_success" />
+            android:text="@string/name_success"
+            android:background="?colorSecondary"
+            android:textColor="?colorOnSecondary"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+
+
+        <Button
+            android:id="@+id/btnSendSMS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pošalji SMS"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
