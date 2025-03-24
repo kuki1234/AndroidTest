@@ -1,39 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SuccessActivity">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:background="@drawable/running_abstract">
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Phone Number to Send SMS:"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/textView"
+    <RadioGroup
+        android:id="@+id/phoneNumberRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioNumber1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/name_success"
-            android:background="?colorSecondary"
-            android:textColor="?colorOnSecondary"
-            android:textAlignment="center"
-            android:textSize="18sp" />
+            android:text="0917829521 (Default)"
+            android:checked="true"/>
 
-
-
-        <Button
-            android:id="@+id/btnSendSMS"
-            android:layout_width="wrap_content"
+        <RadioButton
+            android:id="@+id/radioNumber2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pošalji SMS"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"/>
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="0998765432"/>
 
+        <RadioButton
+            android:id="@+id/radioNumber3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0951234567"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnSendSMS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send SMS"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

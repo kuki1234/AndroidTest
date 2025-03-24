@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <!-- Opis resetiranja brojača -->
     <item
         android:id="@+id/restore_counter"
         android:title="@string/resetiraj"
         android:icon="@drawable/baseline_settings_backup_restore_24"
         app:showAsAction="ifRoom"/>
-
-    <!-- Padajući izbornik za odabir jezika -->
     <item
-        android:id="@+id/action_language"
-        android:title="Odabir jezika"
-        app:showAsAction="ifRoom">
-        <menu>
-            <item
-                android:id="@+id/action_english"
-                android:title="@string/engleski"/>
-            <item
-                android:id="@+id/action_croatian"
-                android:title="@string/hrvatski"/>
-        </menu>
-    </item>
-
+        android:id="@+id/croatian"
+        android:title="@string/hrvatski" />
+    <item
+        android:id="@+id/english"
+        android:title="@string/engleski" />
 </menu>

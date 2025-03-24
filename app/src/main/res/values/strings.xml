@@ -9,4 +9,7 @@
     <string name="hrvatski">Croatian</string>
     <string name="engleski">English</string>
     <string name="success">%1$s, successfully completed 10 steps!</string>
+    <string name="sms_message_en">%1$s just finished running and completed 10 steps! 🏃‍♂️💪</string>
+    <string name="sms_message_hr">%1$s, je upravo završio s trčanjem i prešao 10 koraka! 🏃‍♂️💪</string>
+    <string name="name_hint_en">Enter name</string>
 </resources>

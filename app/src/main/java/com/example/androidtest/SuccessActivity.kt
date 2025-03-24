@@ -1,44 +1,88 @@
 package com.example.androidtest
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.util.Locale
 
 class SuccessActivity : AppCompatActivity() {
-    lateinit var textView: TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Postavljanje jezika prije inflacije layout-a
+        updateBaseContextLocale(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_success)
 
-        textView = findViewById(R.id.textView)
-        val btnSendSMS = findViewById<Button>(R.id.btnSendSMS)
+        // Dohvaćanje View elemenata
+        val textView: TextView = findViewById(R.id.textView)
+        val btnSendSMS: Button = findViewById(R.id.btnSendSMS)
+        val phoneNumberRadioGroup: RadioGroup = findViewById(R.id.phoneNumberRadioGroup)
 
-        // Preuzimanje imena korisnika iz Intenta
-        val name = intent.getStringExtra("name") ?: "Korisnik"  // Ako ime nije proslijeđeno, koristi "Korisnik"
+        // Dohvaćanje korisničkog imena izIntent-a, s mogućnošću fallback vrijednosti
+        val name = intent.getStringExtra("name")
+            ?.replace("Name:", "")  // Uklanjanje "Name:" prefiksa ako postoji
+            ?.trim()
+            ?: "Korisnik"  // Zadana vrijednost ako je null
 
-        // Kreiraj tekst pomoću getString i formatiranja
+        // Kreiranje poruke uspjeha koristeći getString()
         val successMessage = getString(R.string.success, name)
-
-        // Postavi tekst u TextView
         textView.text = successMessage
 
+        // Funkcionalnost slanja SMS-a s lokalizacijom
         btnSendSMS.setOnClickListener {
-            val phoneNumber = "0917829521"
-            val message = "$name je upravo završio trčanje i prešao 10 koraka! 🏃‍♂️💪"
-
-            val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("smsto:$phoneNumber")
-                putExtra("sms_body", message)
+            // Odabir broja telefona
+            val selectedPhoneNumber = when (phoneNumberRadioGroup.checkedRadioButtonId) {
+                R.id.radioNumber1 -> "0917829521"
+                R.id.radioNumber2 -> "0998765432"
+                R.id.radioNumber3 -> "0951234567"
+                else -> "0917829521"  // Zadani broj
             }
 
-            startActivity(smsIntent)
+            // Dohvaćanje trenutnog jezika
+            val sharedPreferences = getSharedPreferences("LanguagePrefs", Context.MODE_PRIVATE)
+            val languageCode = sharedPreferences.getString("language", "hr") ?: "hr"
+
+            // Odabir odgovarajuće SMS poruke ovisno o jeziku
+            val message = when (languageCode) {
+                "en" -> getString(R.string.sms_message_en, name)
+                "hr" -> getString(R.string.sms_message_hr, name)
+                else -> getString(R.string.sms_message_hr, name)  // Zadani tekst
+            }
+
+            try {
+                // Kreiranje SMS intent-a
+                val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("smsto:$selectedPhoneNumber")
+                    putExtra("sms_body", message)
+                }
+
+                // Pokretanje SMS aktivnosti
+                startActivity(smsIntent)
+            } catch (e: Exception) {
+                // Prikaz greške ako slanje SMS-a nije uspjelo
+                Toast.makeText(this, "Slanje SMS-a nije uspjelo", Toast.LENGTH_SHORT).show()
+            }
         }
     }
+
+    // Metoda za ažuriranje konteksta s trenutnim jezikom
+    private fun updateBaseContextLocale(context: Context): Context {
+        val sharedPreferences = context.getSharedPreferences("LanguagePrefs", Context.MODE_PRIVATE)
+        val languageCode = sharedPreferences.getString("language", "hr") ?: "hr"
+
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val configuration = Configuration()
+        configuration.setLocale(locale)
+
+        return context.createConfigurationContext(configuration)
+    }
 }
-
-
-

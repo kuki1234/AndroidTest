@@ -1,28 +1,28 @@
 package com.example.androidtest
 
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import android.content.Context
-import android.widget.Button
-import android.widget.TextView
-import android.content.Intent
-import android.content.res.Configuration
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ContextMenu
-import android.view.MenuInflater
-import android.view.View
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private var counter = 0
     private lateinit var textViewCounter: TextView
+    private lateinit var editTextName: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,25 +34,36 @@ class MainActivity : AppCompatActivity() {
         val upButton = findViewById<Button>(R.id.buttonUp)
         val downButton = findViewById<Button>(R.id.buttonDown)
 
+        editTextName = findViewById(R.id.plainTextName)
 
-        // Spremanje imena korisnika
-        val plainTextName = findViewById<TextView>(R.id.plainTextName) // Ovdje se uzima ime korisnika
-        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("USER_NAME", plainTextName.text.toString()) // Spremaj ime
-        editor.apply()
+        // Postavljanje inicijalnog jezika i hint-a
+        val sharedPreferences = getSharedPreferences("LanguagePrefs", Context.MODE_PRIVATE)
+        val languageCode = sharedPreferences.getString("language", "hr") ?: "hr"
+
+        // Postavljanje hint-a ovisno o jeziku
+        editTextName.hint = when(languageCode) {
+            "en" -> getString(R.string.name_hint_en)
+            "hr" -> getString(R.string.name)
+            else -> getString(R.string.name)
+        }
+
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
 
         // Učitavanje spremljene vrijednosti iz SharedPreferences
-        counter = sharedPreferences.getInt("COUNTER_VALUE", 0)
+        counter = sharedPref.getInt("COUNTER_VALUE", 0)
+        counter = 0
         textViewCounter.text = counter.toString()
 
         upButton.setOnClickListener {
             counter++
             if(counter == 10) {
                 counter = 0
+
+                // Dohvaćanje imena, korištenje zadane vrijednosti ako je prazno
+                val name = editTextName.text.toString().ifEmpty { "Korisnik" }
+
                 val intent = Intent(this, SuccessActivity::class.java).apply {
-                    // Prenosi ime korisnika u SuccessActivity
-                    putExtra("name", plainTextName.text.toString())
+                    putExtra("name", name)
                 }
                 startActivity(intent)
             }
@@ -70,7 +81,6 @@ class MainActivity : AppCompatActivity() {
         registerForContextMenu(textViewCounter)
     }
 
-
     // Kreiranje kontekstnog menija na dug pritisak
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
@@ -84,7 +94,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_reset -> {
                 counter = 0
                 textViewCounter.text = counter.toString()
-                Toast.makeText(this, "Broj resetiran!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.resetiraj), Toast.LENGTH_SHORT).show()
                 true
             }
             else -> super.onContextItemSelected(item)
@@ -104,6 +114,61 @@ class MainActivity : AppCompatActivity() {
         textViewCounter.text = counter.toString()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.english -> {
+                changeLanguage(this, "en")
+                recreate()
+                true
+            }
+            R.id.croatian -> {
+                changeLanguage(this, "hr")
+                recreate()
+                true
+            }
+            R.id.restore_counter -> {
+                counter = 0
+                textViewCounter.text = counter.toString()
+                Toast.makeText(this, getString(R.string.resetiraj), Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    fun changeLanguage(context: Context, language: String) {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+
+        // Spremanje odabranog jezika u SharedPreferences
+        val sharedPreferences = getSharedPreferences("LanguagePrefs", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString("language", language)
+            apply()
+        }
+
+        val res = context.resources
+        val config = Configuration(res.configuration)
+        config.setLocale(locale)
+        context.createConfigurationContext(config)
+        res.updateConfiguration(config, res.displayMetrics)
+
+        // Ažuriranje hint-a za EditText ovisno o jeziku
+        editTextName.hint = when(language) {
+            "en" -> getString(R.string.name_hint_en)
+            "hr" -> getString(R.string.name)
+            else -> getString(R.string.name)
+        }
+    }
+
+    // Lifecycle metode za logging
     override fun onStart() {
         super.onStart()
         Toast.makeText(applicationContext, "onStart", Toast.LENGTH_SHORT).show()
@@ -141,50 +206,5 @@ class MainActivity : AppCompatActivity() {
         super.onRestart()
         Toast.makeText(applicationContext, "onRestart", Toast.LENGTH_SHORT).show()
         Log.i("MyLog", "onRestart")
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_english -> {
-                changeLanguage(this, "en")  // Postavljanje jezika na engleski
-                recreate()  // Ponovno pokreće aktivnost da primijeni promjene
-                true
-            }
-            R.id.action_croatian -> {
-                changeLanguage(this, "hr")  // Postavljanje jezika na hrvatski
-                recreate()  // Ponovno pokreće aktivnost da primijeni promjene
-                true
-            }
-            R.id.restore_counter -> {  // Dodajte ovo za resetiranje brojača
-                counter = 0  // Resetirajte brojač
-                textViewCounter.text = counter.toString()  // Ažurirajte UI
-                Toast.makeText(this, "Broj resetiran!", Toast.LENGTH_SHORT).show()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-
-    @Suppress("DEPRECATION")
-    fun changeLanguage(context: Context, language: String) {
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-        val res = context.resources
-        val config = Configuration(res.configuration)
-        config.setLocale(locale)
-        context.createConfigurationContext(config)
-        res.updateConfiguration(config, res.displayMetrics)
-    }
-
-
-    class MyActivity : AppCompatActivity() {
-        // ...
     }
 }
