@@ -12,4 +12,5 @@
     <string name="sms_message_en" translatable="false">%1$s just finished running and completed 10 steps! 🏃‍♂️💪</string>
     <string name="sms_message_hr">%1$s, je upravo završio s trčanjem i prešao 10 koraka! 🏃‍♂️💪</string>
     <string name="name_hint_en">Unesite ime</string>
+    <string name="delete">Izbrisi</string>
 </resources>

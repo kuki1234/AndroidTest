@@ -51,4 +51,11 @@
         android:layout_height="wrap_content"
         android:text="Send SMS"
         android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/buttonDeleteData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delete"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -13,12 +13,19 @@ import androidx.appcompat.app.AppCompatActivity
 import java.util.Locale
 
 class SuccessActivity : AppCompatActivity() {
+    private lateinit var databaseHelper: DatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Postavljanje jezika prije inflacije layout-a
         updateBaseContextLocale(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_success)
+
+        // Initialize DatabaseHelper
+        databaseHelper = DatabaseHelper(this)
+
+
 
         // Dohvaćanje View elemenata
         val textView: TextView = findViewById(R.id.textView)
@@ -31,9 +38,24 @@ class SuccessActivity : AppCompatActivity() {
             ?.trim()
             ?: "Korisnik"  // Zadana vrijednost ako je null
 
-        // Kreiranje poruke uspjeha koristeći getString()
-        val successMessage = getString(R.string.success, name)
-        textView.text = successMessage
+        // Dohvaćanje liste uspješnih korisnika iz baze podataka
+        val successfulUsers = databaseHelper.getSuccessfulUsers()
+
+        // Kreiranje comprehensive poruke koja uključuje osobnu poruku i listu uspješnih korisnika
+        val completeMessage = """
+            Čestitamo, $name! Uspješno ste napravili 10 koraka!
+            
+            Successful users:
+            ${successfulUsers.joinToString("\n")}
+        """.trimIndent()
+
+        textView.text = completeMessage
+
+        val buttonDeleteData = findViewById<Button>(R.id.buttonDeleteData)
+        buttonDeleteData.setOnClickListener {
+            databaseHelper.deleteAllData()
+            findViewById<TextView>(R.id.textView).text = ""
+        }
 
         // Funkcionalnost slanja SMS-a s lokalizacijom
         btnSendSMS.setOnClickListener {
@@ -51,9 +73,9 @@ class SuccessActivity : AppCompatActivity() {
 
             // Odabir odgovarajuće SMS poruke ovisno o jeziku
             val message = when (languageCode) {
-                "en" -> getString(R.string.sms_message_en, name)
-                "hr" -> getString(R.string.sms_message_hr, name)
-                else -> getString(R.string.sms_message_hr, name)  // Zadani tekst
+                "en" -> "Congratulations, $name! You've completed 10 steps!"
+                "hr" -> "Čestitamo, $name! Uspješno ste napravili 10 koraka!"
+                else -> "Čestitamo, $name! Uspješno ste napravili 10 koraka!"  // Zadani tekst
             }
 
             try {
